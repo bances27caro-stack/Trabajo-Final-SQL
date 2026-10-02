@@ -13,7 +13,7 @@ Mi objetivo es utilizar SQL para analizar los datos de gestión hospitalaria y p
 - [Base de datos](#base-de-datos)
 - [Tareas](#tareas)
 - [Limpieza y reparación de datos](#limpieza-y-reparación-de-datos)
-- [Análisis exploratorio de Datos](#análisis-exploratorio-de-datos)
+- [Análisis exploratorio de datos](#análisis-exploratorio-de-datos)
 
 ## Base de datos
 
@@ -21,7 +21,7 @@ Los datos originales se pueden encontrar [aquí](https://www.kaggle.com/datasets
 
 La información se encuentra organizada en cinco tablas relacionadas entre sí: `patients`, `doctors`, `appointments`, `treatments` y `billing`.
 
-La estructura de la base de datos permite seguir el flujo de atención desde el registro del paciente y la programación de una cita, hasta la asignación del médico, la realización de tratamientos y la facturación correspondiente, distribuidos en más de 5, 000 registros y 39 columnas.
+La estructura de la base de datos permite seguir el flujo de atención desde el registro del paciente y la programación de una cita, hasta la asignación del médico, la realización de tratamientos y la facturación correspondiente, distribuidos en más de 3, 000 registros y 39 columnas.
 
 ## Tareas
 
@@ -30,14 +30,14 @@ En este análisis, ayudo al director del hospital a respoder las siguientes inte
 1. ¿Cuántos pacientes están registrados en el hospital y cómo se distribuyen según género?
 2. ¿Cuántos pacientes se registraron durante cada año y cuál fue el año con mayor cantidad de nuevos registros?
 3. ¿Cómo se distribuyen las citas según su estado y cuál es la cantidad de citas completadas, canceladas y no asistidas?
-4. ¿Cuáles son los principales motivos de visita y cuántas citas corresponden a cada uno?
-5. ¿Cuántas citas ha atendido cada médico y cuál es su especialidad y sede hospitalaria?
-6. ¿Qué especialidades médicas concentran la mayor cantidad de citas y cuál es el promedio de años de experiencia de sus médicos?
-7. ¿Qué tipos de tratamiento se realizan con mayor frecuencia y cuál es el costo promedio de cada tipo de tratamiento?
+4. ¿Qué motivos de visita presentan el mayor porcentaje de citas no completadas?
+5. ¿Qué médicos tienen la mayor carga de citas y cuál es su porcentaje de citas completadas?
+6. ¿Qué especialidades concentran la mayor cantidad de citas y cuál es el promedio de años de experiencia de sus médicos?
+7. ¿Qué tipos de tratamiento son los más frecuentes y cuál es su costo promedio?
 8. ¿Qué tratamientos tienen un costo superior al costo promedio de todos los tratamientos registrados?
-9. ¿Qué pacientes presentan un monto total facturado superior al promedio de facturación por paciente?
+9. ¿Qué pacientes presentan una facturación acumulada superior al promedio de facturación por paciente?
 10. ¿Cuál es el tratamiento de mayor costo dentro de cada tipo de tratamiento?
-11. ¿Cuál es el tratamiento de mayor costo de cada categoría y cómo se compara su costo con el costo promedio de su respectiva categoría?
+11. ¿Cómo se compara el tratamiento de mayor costo de cada tipo con el costo promedio de su respectiva categoría?
 12. ¿Qué tipos de tratamiento concentran los mayores montos de facturación y cómo se distribuyen estos montos según el estado de pago?
 
 ## Limpieza y reparación de datos
@@ -125,4 +125,324 @@ HAVING COUNT(*) > 1;
 
 **Resultado**: No se identificaron registros duplicados en los campos clave, por lo que los registros mantienen identificadores únicos.
 
-### 
+## Análisis exploratorio de datos
+
+### *Pregunta 1: ¿Cuántos pacientes están registrados en el hospital y cómo se distribuyen según género?*
+
+Encontré la cantidad de pacientes registrados y su distribución según género utilizando las funciones `COUNT`, `GROUP BY` y `ORDER BY`. La función `COUNT(*)` permitió contabilizar los pacientes de cada género, mientras que `GROUP BY` agrupó los registros según el valor de la columna gender. Finalmente, `ORDER BY` permitió ordenar los resultados de mayor a menor cantidad de pacientes.
+
+```sql
+-- Distribución de pacientes según género --
+
+SELECT gender, COUNT(*) AS Total_Pacientes
+FROM patients
+GROUP BY gender
+ORDER BY Total_Pacientes DESC;
+```
+<p align="center"><img src= img/pregunta1.png>
+
+El análisis muestra que el hospital cuenta con **50 pacientes** registrados. De este total, **31 son hombres y 19 son mujeres**, por lo que los **hombres representan el 62%** de los registros, mientras que las **mujeres representan el 38%**.
+
+El director puede utilizar esta información como referencia para analizar posteriormente la demanda de citas y tratamientos según el género de los pacientes.
+
+### *Pregunta 2: ¿Cuántos pacientes se registraron durante cada año y cuál fue el año con mayor cantidad de nuevos registros?*
+
+Analicé la cantidad de pacientes registrados en cada año utilizando las funciones `COUNT`, `YEAR`, `GROUP BY` y `ORDER BY`. La función `YEAR` permitió extraer el año de la fecha de registro del paciente, mientras que `COUNT(*)` permitió contabilizar los registros correspondientes a cada año. Finalmente, `GROUP BY` agrupó los pacientes por año y `ORDER BY` permitió ordenar los resultados de mayor a menor cantidad de registros.
+
+```sql
+-- Cantidad de pacientes registrados por año --
+SELECT 
+    YEAR(registration_date) AS `Año`,
+    COUNT(*) AS Total_Pacientes
+FROM patients
+GROUP BY YEAR(registration_date)
+ORDER BY Total_Pacientes DESC;
+```
+<p align="center"><img src= img/pregunta2.png>
+
+El análisis muestra que **2021** fue el año con **mayor cantidad de nuevos registros**, con **21 pacientes**, seguido de **2022** con **17 pacientes**. En total, se registraron 50 pacientes durante los años analizados.
+
+El director puede utilizar esta información para identificar los años en los que se presentó una mayor incorporación de pacientes y considerar estos cambios al analizar la demanda de atención del hospital.
+
+### *Pregunta 3: ¿Cómo se distribuyen las citas según su estado y cuál es la cantidad de citas completadas, canceladas y no asistidas?*
+
+Para conocer el comportamiento de las citas, agrupé los registros según su estado utilizando `COUNT`, `GROUP BY` y `ORDER BY`. `COUNT(*)` permitió contabilizar las citas de cada categoría, mientras que `GROUP BY` las agrupó según su estado. Finalmente, `ORDER BY` organizó los resultados de mayor a menor cantidad de citas.
+
+```sql
+-- Distribución de citas según estado --
+SELECT status, COUNT(*) AS Total_Citas
+FROM appointments
+GROUP BY status
+ORDER BY Total_Citas DESC;
+```
+<p align="center"><img src= img/pregunta3.png>
+
+El análisis muestra que **No-show** concentra la mayor cantidad de citas, con **52 registros**, seguido de **Scheduled** y **Cancelled**, con **51 citas cada uno**. Por último, se encuentran las citas **Completed**, con **46 registros**.
+
+En total, se analizaron **200 citas**. Las citas no asistidas representan el **26%** del total, mientras que las citas programadas y canceladas representan cada una el **25,5%** y las citas completadas el **23%**.
+
+El director puede prestar especial atención a las citas **No-show**, ya que representan la categoría con mayor cantidad de registros y constituyen una oportunidad para revisar las causas de las inasistencias y evaluar acciones que ayuden a reducirlas.
+
+### *Pregunta 4: ¿Qué motivos de visita presentan el mayor porcentaje de citas no completadas?*
+
+Para esta pregunta vamos a analizar los motivos de visita con mayor proporción de citas no completadas, utilicé las funciones `COUNT`, `SUM`, `CASE`, `ROUND`, `GROUP BY`, `HAVING` y `ORDER BY`. La expresión `CASE` permitió identificar las citas que fueron canceladas o en las que el paciente no asistió, mientras que `SUM` permitió contabilizar estos casos. Posteriormente, se calculó el porcentaje de citas no completadas respecto al total de citas de cada motivo. Finalmente, `HAVING` permitió considerar únicamente los motivos que cuentan con al menos cinco citas y `ORDER BY` organizó los resultados de mayor a menor porcentaje.
+
+```sql
+-- Motivos de visita con mayor porcentaje de citas no completadas --
+
+SELECT reason_for_visit, COUNT(*) AS Total_Citas, 
+    SUM(CASE WHEN status IN ('Cancelled', 'No-show') THEN 1 ELSE 0 END ) AS Citas_No_Completadas, 
+                ROUND( SUM( CASE WHEN status IN ('Cancelled', 'No-show') THEN 1 ELSE 0 END ) * 100.0 / COUNT(*), 2 ) AS Porcentaje_No_Completada
+FROM appointments 
+GROUP BY reason_for_visit
+HAVING COUNT(*) >= 5 
+ORDER BY Porcentaje_No_Completada DESC;
+```
+
+<p align="center"><img src= img/pregunta4.png>
+
+Los resultados muestran que **Emergency** presenta el mayor porcentaje de citas no completadas, con **62,07%**, correspondiente a **18 de 29 citas**. Le sigue **Consultation**, con **60,47%**, equivalente a **26 de 43 citas**, mientras que **Therapy** alcanza un **59,52%**, con **25 de 42 citas**.
+
+Por otro lado, **Checkup** presenta un porcentaje de citas no completadas de **40,00%**, mientras que **Follow-up** registra el porcentaje más bajo, con **39,02%**, correspondiente a **16 de 41 citas**.
+
+En general, los resultados muestran diferencias importantes entre los motivos de visita: **Emergency, Consultation y Therapy** superan el 59% de citas no completadas, mientras que **Checkup y Follow-up** se mantienen alrededor del 40%.
+
+El director podría implementar un sistema de confirmación y recordatorio de citas para los servicios de Emergency, Consultation y Therapy, priorizando estos motivos debido a sus mayores porcentajes de citas no completadas.
+
+### *Pregunta 5: ¿Qué médicos tienen la mayor carga de citas y cuál es su porcentaje de citas completadas?*
+
+La consulta permitió identificar la cantidad de citas asignadas a cada médico y comparar este volumen con el porcentaje de citas que fueron completadas. Para ello, se relacionaron las tablas `doctors` y `appointments` mediante `JOIN`. Además, se utilizaron `COUNT` para contabilizar las citas, `CASE` y `SUM` para identificar las citas completadas y `ROUND` para calcular el porcentaje correspondiente.
+
+```sql
+-- Carga de citas y porcentaje de citas completadas por médico --
+
+SELECT
+    d.doctor_id,
+    d.specialization,
+    d.hospital_branch,
+    COUNT(a.appointment_id) AS Total_Citas,
+    SUM(CASE WHEN a.status = 'Completed' THEN 1 ELSE 0 END) AS Citas_Completadas,
+        ROUND(SUM(CASE WHEN a.status = 'Completed' THEN 1 ELSE 0 END) * 100.0 / COUNT(a.appointment_id), 2) AS Porcentaje_Completadas
+FROM doctors AS d
+JOIN appointments AS a
+    ON d.doctor_id = a.doctor_id
+GROUP BY
+    d.doctor_id,
+    d.specialization,
+    d.hospital_branch
+ORDER BY Total_Citas DESC;
+```
+<p align="center"><img src= img/pregunta5.png>
+
+Los resultados muestran que **D005**, de la especialidad de Dermatology y perteneciente a Central Hospital, concentra la mayor cantidad de citas, con **29 registros**, pero solo **4 fueron completadas**, lo que representa un **13,79%**. Le sigue **D001**, también de Dermatology, con **25 citas** y un **24,00%** de citas completadas.
+
+En Pediatría, **D006** registra **24 citas** y un **20,83%** de citas completadas, mientras que **D003** presenta **22 citas** y el porcentaje de **27,27%**. Por otro lado, **D007**, de **Oncology** y ubicado en Westside Clinic, registra la menor cantidad de citas, con 13, pero presenta el porcentaje más alto de citas completadas, con **38,46%**.
+
+En general, los resultados muestran que una mayor cantidad de citas asignadas no necesariamente se relaciona con un mayor porcentaje de citas completadas. El caso de **D005** es el más representativo, ya que concentra la mayor carga de citas y, al mismo tiempo, presenta el porcentaje más bajo de citas completadas.
+
+El director podría implementar un seguimiento semanal de las citas programadas y no completadas por médico, con el fin de detectar dónde se concentran las inasistencias y ajustar oportunamente la programación de citas.
+
+### *Pregunta 6: ¿Qué especialidades concentran la mayor cantidad de citas y cuál es el promedio de años de experiencia de sus médicos?*
+
+La información obtenida permite comparar la cantidad de citas atendidas por cada especialidad con el promedio de años de experiencia de los médicos que pertenecen a ella. Para ello, se relacionaron las tablas `doctors` y`appointments` mediante `JOIN`. Se utilizaron `COUNT` para contabilizar las citas, `AVG` para calcular el promedio de experiencia y `ROUND` para presentar este valor con dos decimales. Finalmente, `GROUP BY` permitió agrupar los resultados por especialidad y `ORDER BY` organizó las especialidades según la cantidad de citas.
+
+```sql
+-- Citas y experiencia promedio por especialidad --
+SELECT 
+    d.specialization, 
+    COUNT(a.appointment_id) AS Total_Citas, 
+    COUNT(DISTINCT d.doctor_id) AS Total_Medicos, 
+    ROUND(AVG(d.years_experience), 2) AS Promedio_Experiencia 
+FROM doctors AS d 
+JOIN appointments AS a 
+    ON d.doctor_id = a.doctor_id 
+GROUP BY d.specialization 
+ORDER BY Total_Citas DESC;
+```
+<p align="center"><img src= img/pregunta6.png>
+
+Pediatrics concentra la mayor cantidad de citas, con **98 registros distribuidos entre 5 médicos**, y presenta un promedio de **23,55 años de experiencia**. Le sigue Dermatology, con **70 citas entre 3 médicos** y un promedio de **17,99 años de experiencia**. Finalmente, Oncology registra **32 citas entre 2 médicos**, con un promedio de **23,03 años de experiencia**.
+
+El director podría priorizar la planificación de personal en Pediatrics, debido a que concentra la mayor cantidad de citas, y evaluar si la cantidad de médicos asignados es suficiente para atender esta demanda.
+
+### *Pregunta 7: ¿Qué tipos de tratamiento son los más frecuentes y cuál es su costo promedio?*
+
+La consulta permitió comparar la frecuencia de los diferentes tipos de tratamiento y su costo promedio. Para ello, se utilizaron las funciones `COUNT` para contabilizar los tratamientos y `AVG` para calcular el costo promedio. Asimismo, `GROUP BY` permitió agrupar los registros según el tipo de tratamiento, mientras que `ROUND` presentó los costos con dos decimales. Finalmente, `ORDER BY` organizó los resultados de acuerdo con la cantidad de tratamientos realizados.
+
+```sql
+-- Frecuencia y costo promedio por tipo de tratamiento --
+SELECT 
+    treatment_type, 
+    COUNT(*) AS Total_Tratamientos, 
+    ROUND(AVG(cost), 2) AS Costo_Promedio 
+FROM treatments 
+GROUP BY treatment_type 
+ORDER BY Total_Tratamientos DESC;
+```
+<p align="center"><img src= img/pregunta7.png>
+
+La **Chemotherapy** fue el tratamiento más frecuente, con **49 registros**, seguida de **X-Ray** con 41 y **ECG** con 38. Por otro lado, **MRI** presentó el mayor costo promedio, con **S/ 3,224.95**, aunque registró 36 tratamientos. **Chemotherapy** tuvo un costo promedio de **S/ 2,629.71**, mientras que **X-Ray**, **ECG** y **Physiotherapy** alcanzaron S/ 2,698.87, S/ 2,532.22 y S/ 2,761.61, respectivamente.
+
+El director podría considerar la frecuencia y el costo promedio de cada tratamiento para priorizar la planificación de recursos, especialmente en los tratamientos con mayor demanda y en aquellos que representan un mayor costo promedio, como MRI.
+
+### *Pregunta 8: ¿Qué tratamientos tienen un costo superior al costo promedio de todos los tratamientos registrados?*
+
+Esta pregunta nos permitirá comparar el costo de cada tratamiento con el **costo promedio general** de todos los tratamientos registrados. Para ello, utilizaremos una **subconsulta** para obtener el promedio general y luego filtraremos aquellos tratamientos cuyo costo sea superior a dicho valor.
+
+La consulta puede resolverse con `AVG` para calcular el promedio general y una subconsulta dentro de `WHERE` para realizar la comparación.
+
+```sql
+-- Tratamientos con costo superior al promedio general --
+SELECT treatment_id,treatment_type, cost
+FROM treatments
+WHERE cost > (
+    SELECT AVG(cost)
+    FROM treatments)
+ORDER BY cost DESC;
+```
+
+<p align="center"><img src= img/pregunta8.png>
+
+Entre los registros obtenidos, el tratamiento **T108**, correspondiente a **X-Ray**, presentó el mayor costo con **S/ 4,973.63**, seguido de **T130 (MRI)** con **S/ 4,966.18** y **T156 (Chemotherapy)** con **S/ 4,964.71**. También se identificaron tratamientos de **ECG** y **Physiotherapy** dentro de los registros con costos superiores al promedio general.
+
+El director podría establecer un seguimiento de los tratamientos cuyos costos superan el promedio general, revisando especialmente los registros con valores más elevados para identificar qué factores están asociados a estos mayores costos y mejorar el control de los gastos por tratamiento.
+
+### *Pregunta 9: ¿Qué pacientes presentan una facturación acumulada superior al promedio de facturación por paciente?*
+
+La consulta permitió identificar a los pacientes cuya facturación acumulada se encuentra por encima del promedio de facturación por paciente. Para ello, se utilizó `SUM` para acumular los montos facturados a cada paciente y `GROUP BY` para agrupar los registros por paciente. Además, se empleó una subconsulta para calcular el promedio de las facturaciones acumuladas y `HAVING` para seleccionar únicamente a los pacientes que superan dicho promedio. Finalmente, `ORDER BY` permitió ordenar los resultados de mayor a menor facturación.
+
+```sql
+-- Pacientes cuya facturación acumulada supera el promedio --
+SELECT
+    p.patient_id,
+    p.first_name,
+    p.last_name,
+    SUM(b.amount) AS Facturacion_Acumulada
+FROM patients AS p
+JOIN billing AS b
+    ON p.patient_id = b.patient_id
+GROUP BY
+    p.patient_id,
+    p.first_name,
+    p.last_name
+HAVING SUM(b.amount) > (
+    SELECT AVG(Facturacion_Paciente)
+    FROM (
+        SELECT
+            patient_id,
+            SUM(amount) AS Facturacion_Paciente
+        FROM billing
+        GROUP BY patient_id
+    ) AS promedio_pacientes
+)
+ORDER BY Facturacion_Acumulada DESC;
+```
+<p align="center"><img src= img/pregunta9.png>
+
+La consulta identificó **20 pacientes** cuya facturación acumulada supera el promedio registrado por paciente. **Laura Davis (P012)** presentó la mayor facturación acumulada, con **S/ 30,053.08**, seguida por **David Moore (P049)** con S/ 23,554.06 y **Michael Taylor (P016)** con S/ 22,967.94. En el extremo inferior del grupo identificado se encuentra **Michael Wilson (P032)**, con S/ 12,234.85.
+
+El hospital podría fortalecer el seguimiento de los servicios asociados a los pacientes con mayor facturación acumulada, con el objetivo de conocer qué atenciones concentran una mayor generación de ingresos.
+
+### *Pregunta 10: ¿Cuál es el tratamiento de mayor costo dentro de cada tipo de tratamiento?*
+
+La consulta permitió identificar el tratamiento con mayor costo dentro de cada tipo. Para ello, se utilizó `ROW_NUMBER()` como función de ventana y `PARTITION BY` para separar los tratamientos según su categoría. Luego, `ORDER BY cost DESC` ordenó los registros de mayor a menor costo dentro de cada grupo, asignando la posición 1 al tratamiento más costoso de cada tipo. Finalmente, `WHERE Posicion = 1` permitió obtener únicamente el registro de mayor costo de cada categoría.
+
+```SQL
+-- Tratamiento de mayor costo dentro de cada tipo --
+WITH Tratamientos_Rankeados AS (
+    SELECT
+        treatment_id,
+        treatment_type,
+        cost,
+        ROW_NUMBER() OVER (
+            PARTITION BY treatment_type
+            ORDER BY cost DESC
+        ) AS Posicion
+    FROM treatments
+)
+
+SELECT
+    treatment_id,
+    treatment_type,
+    cost
+FROM Tratamientos_Rankeados
+WHERE Posicion = 1
+ORDER BY cost DESC;
+```
+<p align="center"><img src= img/pregunta10.png>
+
+El tratamiento de mayor costo fue **T108**, correspondiente a **X-Ray, con S/ 4,973.63**. Le siguieron **T130 (MRI)** con S/ 4,966.18, **T156 (Chemotherapy)** con S/ 4,964.71, **T083 (ECG)** con S/ 4,960.65 y **T192 (Physiotherapy)** con S/ 4,846.20. En todos los tipos de tratamiento se identificó un registro cuyo costo supera los S/ 4,800.
+
+El director podría utilizar los costos máximos identificados como valores de referencia para establecer rangos de costo por tipo de tratamiento, facilitando la planificación presupuestaria y la asignación de recursos para cada servicio.
+
+### *Pregunta 11: ¿Cómo se compara el tratamiento de mayor costo de cada tipo con el costo promedio de su respectiva categoría?*
+
+En esta consulta compararemos el tratamiento más costoso de cada categoría con el costo promedio de esa misma categoría. Para ello, primero se utilizará `AVG` para calcular el costo promedio por tipo y `ROW_NUMBER()` para identificar el tratamiento de mayor costo dentro de cada grupo. Finalmente, ambas consultas se relacionarán mediante `JOIN` para calcular cuánto supera el tratamiento más costoso al promedio de su categoría.
+
+```SQL
+-- Comparación entre el tratamiento más costoso y el promedio de su categoría --
+
+WITH Promedios AS (
+    SELECT
+        treatment_type,
+        AVG(cost) AS Costo_Promedio
+    FROM treatments
+    GROUP BY treatment_type
+),
+
+Tratamientos_Rankeados AS (
+    SELECT
+        treatment_id,
+        treatment_type,
+        cost,
+        ROW_NUMBER() OVER (
+            PARTITION BY treatment_type
+            ORDER BY cost DESC
+        ) AS Posicion
+    FROM treatments
+)
+
+SELECT
+    t.treatment_id,
+    t.treatment_type,
+    t.cost AS Costo_Maximo,
+    ROUND(p.Costo_Promedio, 2) AS Costo_Promedio,
+    ROUND(t.cost - p.Costo_Promedio, 2) AS Diferencia
+FROM Tratamientos_Rankeados AS t
+JOIN Promedios AS p
+    ON t.treatment_type = p.treatment_type
+WHERE t.Posicion = 1
+ORDER BY Diferencia DESC;
+```
+<p align="center"><img src= img/pregunta11.png>
+
+El tratamiento de mayor costo de **ECG** presentó la mayor diferencia respecto al promedio de su categoría, con **S/ 2,428.43**, seguido de **Chemotherapy** con S/ 2,335.00 y **X-Ray** con S/ 2,274.76. Por otro lado, **MRI** presentó la menor diferencia, con S/ 1,741.23, aunque registró el costo promedio más alto, de **S/ 3,224.95**.
+
+El director podría utilizar las diferencias entre el costo máximo y el promedio de cada categoría para identificar los tipos de tratamiento con mayor variación de costos y evaluar si requieren criterios de tarifación diferenciados.
+
+### *Pregunta 12: ¿Qué tipos de tratamiento concentran los mayores montos de facturación y cómo se distribuyen estos montos según el estado de pago?*
+
+Esta pregunta permitirá relacionar los tratamientos con la información de facturación para identificar qué tipos de tratamiento generan los mayores montos y cómo se distribuyen según el estado de pago. Se utilizarán `JOIN` para relacionar las tablas, `SUM` para calcular los montos facturados y `CASE` para separar la facturación según el estado de pago. Finalmente, `GROUP BY` permitirá organizar los resultados por tipo de tratamiento.
+
+```SQL
+-- Facturación por tipo de tratamiento y estado de pago --
+
+SELECT
+    t.treatment_type,
+    SUM(b.amount) AS Facturacion_Total,
+    SUM(CASE WHEN b.payment_status = 'Paid' THEN b.amount ELSE 0 END) AS Monto_Pagado,
+    SUM(CASE WHEN b.payment_status = 'Pending' THEN b.amount ELSE 0 END) AS Monto_Pendiente,
+    SUM(CASE WHEN b.payment_status = 'Cancelled' THEN b.amount ELSE 0 END) AS Monto_Cancelado
+FROM treatments AS t
+JOIN billing AS b
+    ON t.treatment_id = b.treatment_id
+GROUP BY t.treatment_type
+ORDER BY Facturacion_Total DESC;
+```
+<p align="center"><img src= img/pregunta12.png>
+
+La facturación total se concentra principalmente en **Chemotherapy**, con **S/ 128,855.68**, seguida de **MRI** con **S/ 116,098.16** y **X-Ray** con **S/ 110,653.67**. En conjunto, estos tres tipos representan los mayores montos facturados del conjunto analizado.
+
+Al comparar los estados de pago, **Chemotherapy presenta el mayor monto pendiente**, con **S/ 51,100.55**, superior a su monto pagado de **S/ 32,607.26**. En **MRI**, el monto pagado **(S/ 43,064.42)** supera al pendiente **(S/ 36,909.79)**, mientras que en **X-Ray** también predomina el monto pagado, con **S/ 47,978.78** frente a **S/ 34,839.29** pendientes. **Physiotherapy** registra **S/ 32,251.38 pagados** y **S/ 21,084.35 pendientes**, mientras que **ECG** presenta **S/ 17,523.06 pagados** y **S/ 40,678.03 pendientes.**
+
+El director podría priorizar la gestión de cobranza de Chemotherapy y ECG, debido a que en ambos tratamientos el monto pendiente supera al monto pagado, representando una mayor proporción de facturación aún no recaudada.
