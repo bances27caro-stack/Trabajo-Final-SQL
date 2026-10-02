@@ -1,6 +1,6 @@
 <p align="center"><img src= img/portada.png>
 
-# Proyecto SQL: Datos a decisiones - Análisis de Atenciones del hospital Management Dataset
+# Proyecto SQL: Datos a decisiones - Análisis de Atenciones del Hospital Management Dataset
 
 ## Resumen (Overview)
 
@@ -91,7 +91,7 @@ A continuación, se verificó la existencia de registros duplicados en los ident
 
 SELECT appointment_id, COUNT(*)
 FROM appointments
-GROUP BY appointement_id
+GROUP BY appointment_id
 HAVING COUNT(*) > 1;
 
 -- Verificar valores duplicados en la tabla Patients --
