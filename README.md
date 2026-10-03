@@ -1,6 +1,6 @@
 <p align="center"><img src= img/portada.png>
 
-# Proyecto SQL: Datos a decisiones - Análisis de Atenciones del Hospital Management Dataset
+# Proyecto SQL: Datos a decisiones - Análisis de atenciones del Hospital Management Dataset
 
 ## Resumen (Overview)
 
@@ -14,6 +14,7 @@ Mi objetivo es utilizar SQL para analizar los datos de gestión hospitalaria y p
 - [Tareas](#tareas)
 - [Limpieza y reparación de datos](#limpieza-y-reparación-de-datos)
 - [Análisis exploratorio de datos](#análisis-exploratorio-de-datos)
+- [Conclusiones](conclusiones)
 
 ## Base de datos
 
@@ -21,13 +22,13 @@ Los datos originales se pueden encontrar [aquí](https://www.kaggle.com/datasets
 
 La información se encuentra organizada en cinco tablas relacionadas entre sí: `patients`, `doctors`, `appointments`, `treatments` y `billing`.
 
-La estructura de la base de datos permite seguir el flujo de atención desde el registro del paciente y la programación de una cita, hasta la asignación del médico, la realización de tratamientos y la facturación correspondiente, distribuidos en más de 3, 000 registros y 39 columnas.
+La estructura de los datos permite seguir el flujo de atención desde el registro del paciente y la programación de una cita, hasta la asignación del médico, la realización de tratamientos y la facturación correspondiente. Toda la información se encuentra distribuidos en más de 3, 000 registros y 39 columnas.
 
 ## Tareas
 
-En este análisis, ayudo al director del hospital a respoder las siguientes interrogantes:
+Este análisis, ayudo al director del hospital a respoder las siguientes interrogantes:
 
-1. ¿Cuántos pacientes están registrados en el hospital y cómo se distribuyen según género?
+1. ¿Cuántos pacientes están registrados en el hospital y cómo se distribuyen según el género?
 2. ¿Cuántos pacientes se registraron durante cada año y cuál fue el año con mayor cantidad de nuevos registros?
 3. ¿Cómo se distribuyen las citas según su estado y cuál es la cantidad de citas completadas, canceladas y no asistidas?
 4. ¿Qué motivos de visita presentan el mayor porcentaje de citas no completadas?
@@ -127,12 +128,12 @@ HAVING COUNT(*) > 1;
 
 ## Análisis exploratorio de datos
 
-### *Pregunta 1: ¿Cuántos pacientes están registrados en el hospital y cómo se distribuyen según género?*
+### *Pregunta 1: ¿Cuántos pacientes están registrados en el hospital y cómo se distribuyen según el género?*
 
-Encontré la cantidad de pacientes registrados y su distribución según género utilizando las funciones `COUNT`, `GROUP BY` y `ORDER BY`. La función `COUNT(*)` permitió contabilizar los pacientes de cada género, mientras que `GROUP BY` agrupó los registros según el valor de la columna gender. Finalmente, `ORDER BY` permitió ordenar los resultados de mayor a menor cantidad de pacientes.
+Encontré la cantidad de pacientes registrados y su distribución según el género utilizando las funciones `COUNT`, `GROUP BY` y `ORDER BY`. La función `COUNT(*)` permitió contabilizar los pacientes de cada género, mientras que `GROUP BY` agrupó los registros según el valor de la columna gender. Finalmente, `ORDER BY` permitió ordenar los resultados de mayor a menor cantidad de pacientes.
 
 ```sql
--- Distribución de pacientes según género --
+-- Distribución de pacientes según el género --
 
 SELECT gender, COUNT(*) AS Total_Pacientes
 FROM patients
@@ -141,9 +142,9 @@ ORDER BY Total_Pacientes DESC;
 ```
 <p align="center"><img src= img/pregunta1.png>
 
-El análisis muestra que el hospital cuenta con **50 pacientes** registrados. De este total, **31 son hombres y 19 son mujeres**, por lo que los **hombres representan el 62%** de los registros, mientras que las **mujeres representan el 38%**.
+El análisis muestra que el hospital cuenta con **50 pacientes** registrados. De este total, los **hombres representan el 62%** de los registros, mientras que las **mujeres representan el 38%**.
 
-El director puede utilizar esta información como referencia para analizar posteriormente la demanda de citas y tratamientos según el género de los pacientes.
+`Decisión sugerida`: El director puede utilizar esta información como referencia para analizar posteriormente la demanda de citas y tratamientos según el género de los pacientes.
 
 ### *Pregunta 2: ¿Cuántos pacientes se registraron durante cada año y cuál fue el año con mayor cantidad de nuevos registros?*
 
@@ -162,7 +163,7 @@ ORDER BY Total_Pacientes DESC;
 
 El análisis muestra que **2021** fue el año con **mayor cantidad de nuevos registros**, con **21 pacientes**, seguido de **2022** con **17 pacientes**. En total, se registraron 50 pacientes durante los años analizados.
 
-El director puede utilizar esta información para identificar los años en los que se presentó una mayor incorporación de pacientes y considerar estos cambios al analizar la demanda de atención del hospital.
+`Decisión sugerida`: El director podría analizar las causas de la disminución de nuevos registros observada entre 2021 y 2023 para identificar oportunidades de captación y fortalecer la incorporación de nuevos pacientes.
 
 ### *Pregunta 3: ¿Cómo se distribuyen las citas según su estado y cuál es la cantidad de citas completadas, canceladas y no asistidas?*
 
@@ -177,11 +178,9 @@ ORDER BY Total_Citas DESC;
 ```
 <p align="center"><img src= img/pregunta3.png>
 
-El análisis muestra que **No-show** concentra la mayor cantidad de citas, con **52 registros**, seguido de **Scheduled** y **Cancelled**, con **51 citas cada uno**. Por último, se encuentran las citas **Completed**, con **46 registros**.
-
 En total, se analizaron **200 citas**. Las citas no asistidas representan el **26%** del total, mientras que las citas programadas y canceladas representan cada una el **25,5%** y las citas completadas el **23%**.
 
-El director puede prestar especial atención a las citas **No-show**, ya que representan la categoría con mayor cantidad de registros y constituyen una oportunidad para revisar las causas de las inasistencias y evaluar acciones que ayuden a reducirlas.
+`Decisión sugerida`: El hospital podría implementar recordatorios previos a las citas, priorizando la reducción de las 52 inasistencias registradas, con el propósito de incrementar la cantidad de atenciones completadas.
 
 ### *Pregunta 4: ¿Qué motivos de visita presentan el mayor porcentaje de citas no completadas?*
 
@@ -201,13 +200,9 @@ ORDER BY Porcentaje_No_Completada DESC;
 
 <p align="center"><img src= img/pregunta4.png>
 
-Los resultados muestran que **Emergency** presenta el mayor porcentaje de citas no completadas, con **62,07%**, correspondiente a **18 de 29 citas**. Le sigue **Consultation**, con **60,47%**, equivalente a **26 de 43 citas**, mientras que **Therapy** alcanza un **59,52%**, con **25 de 42 citas**.
+Los resultados evidencian una mayor proporción de citas no completadas en **Emergency, Consultation y Therapy**, cuyos porcentajes superan el 59%. En contraste, **Checkup y Follow-up** presentan proporciones cercanas al 40%, mostrando una diferencia de más de 19 puntos porcentuales respecto a Emergency.
 
-Por otro lado, **Checkup** presenta un porcentaje de citas no completadas de **40,00%**, mientras que **Follow-up** registra el porcentaje más bajo, con **39,02%**, correspondiente a **16 de 41 citas**.
-
-En general, los resultados muestran diferencias importantes entre los motivos de visita: **Emergency, Consultation y Therapy** superan el 59% de citas no completadas, mientras que **Checkup y Follow-up** se mantienen alrededor del 40%.
-
-El director podría implementar un sistema de confirmación y recordatorio de citas para los servicios de Emergency, Consultation y Therapy, priorizando estos motivos debido a sus mayores porcentajes de citas no completadas.
+`Decisión sugerida`: Se recomienda priorizar la asignación de recursos de atención en Emergency, Consultation y Therapy, considerando que estos servicios presentan los mayores niveles de citas no completadas y, por tanto, un mayor volumen de atenciones que no llegan a concretarse.
 
 ### *Pregunta 5: ¿Qué médicos tienen la mayor carga de citas y cuál es su porcentaje de citas completadas?*
 
@@ -234,13 +229,9 @@ ORDER BY Total_Citas DESC;
 ```
 <p align="center"><img src= img/pregunta5.png>
 
-Los resultados muestran que **D005**, de la especialidad de Dermatology y perteneciente a Central Hospital, concentra la mayor cantidad de citas, con **29 registros**, pero solo **4 fueron completadas**, lo que representa un **13,79%**. Le sigue **D001**, también de Dermatology, con **25 citas** y un **24,00%** de citas completadas.
+La información evidencia diferencias importantes en el nivel de cumplimiento entre los médicos. El caso de **D005** destaca porque combina la mayor cantidad de citas asignadas con el menor porcentaje de citas completadas. En contraste, D007 registra la menor cantidad de citas, pero alcanza el mayor porcentaje de cumplimiento. Esto muestra que una **mayor carga de citas no se traduce necesariamente en una mayor cantidad proporcional de atenciones completadas**.
 
-En Pediatría, **D006** registra **24 citas** y un **20,83%** de citas completadas, mientras que **D003** presenta **22 citas** y el porcentaje de **27,27%**. Por otro lado, **D007**, de **Oncology** y ubicado en Westside Clinic, registra la menor cantidad de citas, con 13, pero presenta el porcentaje más alto de citas completadas, con **38,46%**.
-
-En general, los resultados muestran que una mayor cantidad de citas asignadas no necesariamente se relaciona con un mayor porcentaje de citas completadas. El caso de **D005** es el más representativo, ya que concentra la mayor carga de citas y, al mismo tiempo, presenta el porcentaje más bajo de citas completadas.
-
-El director podría implementar un seguimiento semanal de las citas programadas y no completadas por médico, con el fin de detectar dónde se concentran las inasistencias y ajustar oportunamente la programación de citas.
+`Decisión sugerida`: Se podría redistribuir la carga de citas entre los médicos cuando existan diferencias marcadas entre el volumen asignado y el porcentaje de atenciones completadas, tomando como caso prioritario a D005 por concentrar la mayor cantidad de citas y presentar el menor nivel de cumplimiento
 
 ### *Pregunta 6: ¿Qué especialidades concentran la mayor cantidad de citas y cuál es el promedio de años de experiencia de sus médicos?*
 
@@ -263,7 +254,7 @@ ORDER BY Total_Citas DESC;
 
 Pediatrics concentra la mayor cantidad de citas, con **98 registros distribuidos entre 5 médicos**, y presenta un promedio de **23,55 años de experiencia**. Le sigue Dermatology, con **70 citas entre 3 médicos** y un promedio de **17,99 años de experiencia**. Finalmente, Oncology registra **32 citas entre 2 médicos**, con un promedio de **23,03 años de experiencia**.
 
-El director podría priorizar la planificación de personal en Pediatrics, debido a que concentra la mayor cantidad de citas, y evaluar si la cantidad de médicos asignados es suficiente para atender esta demanda.
+`Decisión sugerida`: Se debería priorizar la planificación de personal en Pediatrics, debido a que concentra la mayor cantidad de citas, y evaluar si la cantidad de médicos asignados es suficiente para atender esta demanda.
 
 ### *Pregunta 7: ¿Qué tipos de tratamiento son los más frecuentes y cuál es su costo promedio?*
 
@@ -283,7 +274,7 @@ ORDER BY Total_Tratamientos DESC;
 
 La **Chemotherapy** fue el tratamiento más frecuente, con **49 registros**, seguida de **X-Ray** con 41 y **ECG** con 38. Por otro lado, **MRI** presentó el mayor costo promedio, con **S/ 3,224.95**, aunque registró 36 tratamientos. **Chemotherapy** tuvo un costo promedio de **S/ 2,629.71**, mientras que **X-Ray**, **ECG** y **Physiotherapy** alcanzaron S/ 2,698.87, S/ 2,532.22 y S/ 2,761.61, respectivamente.
 
-El director podría considerar la frecuencia y el costo promedio de cada tratamiento para priorizar la planificación de recursos, especialmente en los tratamientos con mayor demanda y en aquellos que representan un mayor costo promedio, como MRI.
+`Decisión sugerida`: Se recomienda considerar la frecuencia y el costo promedio de cada tratamiento para priorizar la planificación de recursos, especialmente en los tratamientos con mayor demanda y en aquellos que representan un mayor costo promedio, como MRI.
 
 ### *Pregunta 8: ¿Qué tratamientos tienen un costo superior al costo promedio de todos los tratamientos registrados?*
 
@@ -305,7 +296,7 @@ ORDER BY cost DESC;
 
 Entre los registros obtenidos, el tratamiento **T108**, correspondiente a **X-Ray**, presentó el mayor costo con **S/ 4,973.63**, seguido de **T130 (MRI)** con **S/ 4,966.18** y **T156 (Chemotherapy)** con **S/ 4,964.71**. También se identificaron tratamientos de **ECG** y **Physiotherapy** dentro de los registros con costos superiores al promedio general.
 
-El director podría establecer un seguimiento de los tratamientos cuyos costos superan el promedio general, revisando especialmente los registros con valores más elevados para identificar qué factores están asociados a estos mayores costos y mejorar el control de los gastos por tratamiento.
+`Decisión sugerida`: El director podría establecer un seguimiento de los tratamientos cuyos costos superan el promedio general, revisando especialmente los registros con valores más elevados para identificar qué factores están asociados a estos mayores costos y mejorar el control de los gastos por tratamiento.
 
 ### *Pregunta 9: ¿Qué pacientes presentan una facturación acumulada superior al promedio de facturación por paciente?*
 
@@ -341,7 +332,7 @@ ORDER BY Facturacion_Acumulada DESC;
 
 La consulta identificó **20 pacientes** cuya facturación acumulada supera el promedio registrado por paciente. **Laura Davis (P012)** presentó la mayor facturación acumulada, con **S/ 30,053.08**, seguida por **David Moore (P049)** con S/ 23,554.06 y **Michael Taylor (P016)** con S/ 22,967.94. En el extremo inferior del grupo identificado se encuentra **Michael Wilson (P032)**, con S/ 12,234.85.
 
-El hospital podría fortalecer el seguimiento de los servicios asociados a los pacientes con mayor facturación acumulada, con el objetivo de conocer qué atenciones concentran una mayor generación de ingresos.
+`Decisión sugerida`: El hospital podría fortalecer el seguimiento de los servicios asociados a los pacientes con mayor facturación acumulada, con el objetivo de conocer qué atenciones concentran una mayor generación de ingresos.
 
 ### *Pregunta 10: ¿Cuál es el tratamiento de mayor costo dentro de cada tipo de tratamiento?*
 
@@ -373,7 +364,7 @@ ORDER BY cost DESC;
 
 El tratamiento de mayor costo fue **T108**, correspondiente a **X-Ray, con S/ 4,973.63**. Le siguieron **T130 (MRI)** con S/ 4,966.18, **T156 (Chemotherapy)** con S/ 4,964.71, **T083 (ECG)** con S/ 4,960.65 y **T192 (Physiotherapy)** con S/ 4,846.20. En todos los tipos de tratamiento se identificó un registro cuyo costo supera los S/ 4,800.
 
-El director podría utilizar los costos máximos identificados como valores de referencia para establecer rangos de costo por tipo de tratamiento, facilitando la planificación presupuestaria y la asignación de recursos para cada servicio.
+`Decisión sugerida`: Se podría utilizar los costos máximos identificados como valores de referencia para establecer rangos de costo por tipo de tratamiento, facilitando la planificación presupuestaria y la asignación de recursos para cada servicio.
 
 ### *Pregunta 11: ¿Cómo se compara el tratamiento de mayor costo de cada tipo con el costo promedio de su respectiva categoría?*
 
@@ -418,7 +409,7 @@ ORDER BY Diferencia DESC;
 
 El tratamiento de mayor costo de **ECG** presentó la mayor diferencia respecto al promedio de su categoría, con **S/ 2,428.43**, seguido de **Chemotherapy** con S/ 2,335.00 y **X-Ray** con S/ 2,274.76. Por otro lado, **MRI** presentó la menor diferencia, con S/ 1,741.23, aunque registró el costo promedio más alto, de **S/ 3,224.95**.
 
-El director podría utilizar las diferencias entre el costo máximo y el promedio de cada categoría para identificar los tipos de tratamiento con mayor variación de costos y evaluar si requieren criterios de tarifación diferenciados.
+`Decisión sugerida`: Se recomienda analizar las diferencias entre el costo máximo y el promedio de cada categoría para identificar los tipos de tratamiento con mayor variación de costos y evaluar si requieren criterios de tarifación diferenciados.
 
 ### *Pregunta 12: ¿Qué tipos de tratamiento concentran los mayores montos de facturación y cómo se distribuyen estos montos según el estado de pago?*
 
@@ -445,4 +436,16 @@ La facturación total se concentra principalmente en **Chemotherapy**, con **S/ 
 
 Al comparar los estados de pago, **Chemotherapy presenta el mayor monto pendiente**, con **S/ 51,100.55**, superior a su monto pagado de **S/ 32,607.26**. En **MRI**, el monto pagado **(S/ 43,064.42)** supera al pendiente **(S/ 36,909.79)**, mientras que en **X-Ray** también predomina el monto pagado, con **S/ 47,978.78** frente a **S/ 34,839.29** pendientes. **Physiotherapy** registra **S/ 32,251.38 pagados** y **S/ 21,084.35 pendientes**, mientras que **ECG** presenta **S/ 17,523.06 pagados** y **S/ 40,678.03 pendientes.**
 
-El director podría priorizar la gestión de cobranza de Chemotherapy y ECG, debido a que en ambos tratamientos el monto pendiente supera al monto pagado, representando una mayor proporción de facturación aún no recaudada.
+`Decisión sugerida`: El director podría priorizar la gestión de cobranza de Chemotherapy y ECG, debido a que en ambos tratamientos el monto pendiente supera al monto pagado, representando una mayor proporción de facturación aún no recaudada.
+
+## Conclusiones
+
+- **El uso de `GROUP BY`, `COUNT` y `ORDER BY` permitió segmentar la información de los pacientes y las citas para identificar diferencias entre categorías.** Por ejemplo, la distribución de pacientes mostró 31 registros masculinos y 19 femeninos, mientras que el análisis por estado de las citas permitió identificar 52 casos de No-show, 51 Scheduled, 51 Cancelled y 46 Completed.
+
+- **El uso de funciones de agregación y condiciones con `CASE WHEN` permitió construir indicadores a partir de los datos originales.** En el análisis de las citas por motivo de visita, se calculó la cantidad y el porcentaje de citas no completadas, identificando que Emergency alcanzó el mayor porcentaje con 62,07%, seguido de Consultation con 60,47% y Therapy con 59,52%.
+
+- **La combinación de `JOIN`, `GROUP BY` y funciones de agregación permitió relacionar información de diferentes tablas y obtener indicadores por entidad.** Esto se aplicó, por ejemplo, al relacionar `doctors` con `appointments` para calcular la carga de citas y el porcentaje de atenciones completadas por médico. El resultado permitió identificar que D005 concentró 29 citas, pero solo completó el 13,79% de ellas.
+
+- **El uso de subconsultas y funciones de ventana permitió resolver consultas que requieren comparaciones dentro del conjunto de datos.** La subconsulta utilizada en la facturación permitió identificar pacientes cuya facturación acumulada superaba el promedio por paciente, mientras que `ROW_NUMBER() OVER (PARTITION BY...)` permitió obtener el tratamiento de mayor costo dentro de cada categoría. Esto demuestra la aplicación de SQL no solo para consultar registros, sino también para realizar análisis comparativos sobre los datos.
+
+- **El uso de SQL permitió transformar datos dispersos en información útil para la toma de decisiones**, demostrando cómo las consultas, agrupaciones, filtros y relaciones entre tablas pueden utilizarse para detectar patrones y generar indicadores relevantes para la gestión hospitalaria.
