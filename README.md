@@ -1,4 +1,4 @@
-<p align="center"><img src= img/portada.png width="100%" height="230"></p>
+<p align="center"><img src= img/portada.png width="100%" height="250"></p>
 
 # Proyecto SQL: Análisis de atenciones del Hospital Management Dataset
 
@@ -14,7 +14,7 @@ Mi objetivo es utilizar SQL para analizar los datos de gestión hospitalaria y p
 - [Tareas](#tareas)
 - [Limpieza y reparación de datos](#limpieza-y-reparación-de-datos)
 - [Análisis exploratorio de datos](#análisis-exploratorio-de-datos)
-- [Conclusiones](conclusiones)
+- [Conclusiones](#conclusiones)
 
 ## Base de datos
 
