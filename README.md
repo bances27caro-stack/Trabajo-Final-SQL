@@ -1,6 +1,6 @@
-<p align="center"><img src= img/portada.png>
+<p align="center"><img src= img/portada.png width="100%" height="230"></p>
 
-# Proyecto SQL: Datos a decisiones - Análisis de atenciones del Hospital Management Dataset
+# Proyecto SQL: Análisis de atenciones del Hospital Management Dataset
 
 ## Resumen (Overview)
 
@@ -20,9 +20,18 @@ Mi objetivo es utilizar SQL para analizar los datos de gestión hospitalaria y p
 
 Los datos originales se pueden encontrar [aquí](https://www.kaggle.com/datasets/kanakbaghel/hospital-management-dataset?select=appointments.csv).
 
-La información se encuentra organizada en cinco tablas relacionadas entre sí: `patients`, `doctors`, `appointments`, `treatments` y `billing`.
+Creé una base de datos denominada `hospital_md`, compuesta por cinco tablas relacionadas entre sí: `patients`, `doctors`, `appointments`, `treatments y billing`. La estructura de los datos permite seguir el flujo de atención desde el registro del paciente y la programación de una cita, hasta la asignación del médico, la realización de tratamientos y la facturación correspondiente. En conjunto, la base de datos contiene más de 3,000 registros y 39 columnas.
+A continuación, se presenta la estructura de las tablas y sus principales campos:
 
-La estructura de los datos permite seguir el flujo de atención desde el registro del paciente y la programación de una cita, hasta la asignación del médico, la realización de tratamientos y la facturación correspondiente. Toda la información se encuentra distribuidos en más de 3, 000 registros y 39 columnas.
+| Tabla | Descripción | Principales campos |
+|---|---|---|
+| `patients` | Almacena información demográfica y de contacto de los pacientes.| `patient_id`, `first_name`, `last_name`, `gender`, `date_of_birth` |
+| `doctors` | Información de los médicos y sus especialidades. | `doctor_id`, `specialization`, `years_experience` |
+| `appointments` | Registra las citas médicas y relaciona a los pacientes con los médicos. | `appointment_id`, `patient_id`, `doctor_id`, `appointment_date`, `status` |
+| `treatments` | Registra los tratamientos y procedimientos realizados durante la atención médica. | `treatment_id`, `appointment_id`, `treatment_type`, `cost` |
+| `billing` | Información de facturación y pagos. | `bill_id`, `patient_id`, `treatment_id`, `amount`, `payment_status` |
+
+Las relaciones entre las tablas permiten integrar la información de las distintas etapas de la atención hospitalaria y realizar consultas SQL sobre los datos registrados.
 
 ## Tareas
 
@@ -53,33 +62,32 @@ Primero, se verifica los valores nulos en las tablas.
 -- Verificar valores faltantes en la tabla Appointments --
 
 SELECT *
-FROM appointments
+FROM hospital_md.appointments
 WHERE appointment_id IS NULL;
 
 --Verificar valores faltantes en la tabla Patients--
 
 SELECT *
-FROM patients
+FROM hospital_md.patients
 WHERE patient_id IS NULL;
 
 --Verificar valores faltantes en la tabla Doctors--
 
 SELECT *
-FROM doctors
+FROM hospital_md.doctors
 WHERE doctor_id IS NULL;
 
 --Verificar valores faltantes en la tabla Billing--
 
 SELECT *
-FROM billing
+FROM hospital_md.billing
 WHERE bill_id IS NULL;
 
 --Verificar valores faltantes en la tabla Treatments--
 
 SELECT *
-FROM treatments
+FROM hospital_md.treatments
 WHERE treatment_id IS NULL;
-
 ```
 **Resultado** : No se encontraron valores nulos en las tablas
 
@@ -91,35 +99,35 @@ A continuación, se verificó la existencia de registros duplicados en los ident
 -- Verificar valores duplicados en la tabla Appointments --
 
 SELECT appointment_id, COUNT(*)
-FROM appointments
+FROM hospital_md.appointments
 GROUP BY appointment_id
 HAVING COUNT(*) > 1;
 
 -- Verificar valores duplicados en la tabla Patients --
 
 SELECT patient_id, COUNT(*)
-FROM patients
+FROM hospital_md.patients
 GROUP BY patient_id
 HAVING COUNT(*) > 1;
 
 -- Verificar valores duplicados en la tabla Doctors --
 
 SELECT doctor_id, COUNT(*)
-FROM doctors
+FROM hospital_md.doctors
 GROUP BY doctor_id
 HAVING COUNT(*) > 1;
 
 -- Verificar valores duplicados en la tabla Billing --
 
 SELECT bill_id, COUNT(*)
-FROM billing
+FROM hospital_md.billing
 GROUP BY bill_id
 HAVING COUNT(*) > 1;
 
 -- Verificar valores duplicados en la tabla Treatments --
 
 SELECT treatment_id, COUNT(*)
-FROM treatments
+FROM hospital_md.treatments
 GROUP BY treatment_id
 HAVING COUNT(*) > 1;
 ```
@@ -136,7 +144,7 @@ Encontré la cantidad de pacientes registrados y su distribución según el gén
 -- Distribución de pacientes según el género --
 
 SELECT gender, COUNT(*) AS Total_Pacientes
-FROM patients
+FROM hospital_md.patients
 GROUP BY gender
 ORDER BY Total_Pacientes DESC;
 ```
@@ -152,10 +160,11 @@ Analicé la cantidad de pacientes registrados en cada año utilizando las funcio
 
 ```sql
 -- Cantidad de pacientes registrados por año --
+
 SELECT 
     YEAR(registration_date) AS `Año`,
     COUNT(*) AS Total_Pacientes
-FROM patients
+FROM hospital_md.patients
 GROUP BY YEAR(registration_date)
 ORDER BY Total_Pacientes DESC;
 ```
@@ -163,7 +172,7 @@ ORDER BY Total_Pacientes DESC;
 
 El análisis muestra que **2021** fue el año con **mayor cantidad de nuevos registros**, con **21 pacientes**, seguido de **2022** con **17 pacientes**. En total, se registraron 50 pacientes durante los años analizados.
 
-`Decisión sugerida`: El director podría analizar las causas de la disminución de nuevos registros observada entre 2021 y 2023 para identificar oportunidades de captación y fortalecer la incorporación de nuevos pacientes.
+`Decisión sugerida`: El director podría analizar las causas de la disminución en el número de nuevos registros entre 2021 y 2023, con el fin de identificar oportunidades para fortalecer la captación de pacientes mediante paquetes de servicios y ofertas dirigidas.
 
 ### *Pregunta 3: ¿Cómo se distribuyen las citas según su estado y cuál es la cantidad de citas completadas, canceladas y no asistidas?*
 
@@ -171,8 +180,9 @@ Para conocer el comportamiento de las citas, agrupé los registros según su est
 
 ```sql
 -- Distribución de citas según estado --
+
 SELECT status, COUNT(*) AS Total_Citas
-FROM appointments
+FROM hospital_md.appointments
 GROUP BY status
 ORDER BY Total_Citas DESC;
 ```
@@ -191,8 +201,9 @@ Para esta pregunta vamos a analizar los motivos de visita con mayor proporción 
 
 SELECT reason_for_visit, COUNT(*) AS Total_Citas, 
     SUM(CASE WHEN status IN ('Cancelled', 'No-show') THEN 1 ELSE 0 END ) AS Citas_No_Completadas, 
-                ROUND( SUM( CASE WHEN status IN ('Cancelled', 'No-show') THEN 1 ELSE 0 END ) * 100.0 / COUNT(*), 2 ) AS Porcentaje_No_Completada
-FROM appointments 
+    ROUND( SUM( CASE WHEN status IN ('Cancelled', 'No-show') THEN 1 ELSE 0 END ) * 100.0 / COUNT(*), 2 ) AS Porcentaje_No_Completada
+
+FROM hospital_md.appointments 
 GROUP BY reason_for_visit
 HAVING COUNT(*) >= 5 
 ORDER BY Porcentaje_No_Completada DESC;
@@ -218,8 +229,8 @@ SELECT
     COUNT(a.appointment_id) AS Total_Citas,
     SUM(CASE WHEN a.status = 'Completed' THEN 1 ELSE 0 END) AS Citas_Completadas,
         ROUND(SUM(CASE WHEN a.status = 'Completed' THEN 1 ELSE 0 END) * 100.0 / COUNT(a.appointment_id), 2) AS Porcentaje_Completadas
-FROM doctors AS d
-JOIN appointments AS a
+FROM hospital_md.doctors AS d
+JOIN hospital_md.appointments AS a
     ON d.doctor_id = a.doctor_id
 GROUP BY
     d.doctor_id,
@@ -239,13 +250,14 @@ La información obtenida permite comparar la cantidad de citas atendidas por cad
 
 ```sql
 -- Citas y experiencia promedio por especialidad --
+
 SELECT 
     d.specialization, 
     COUNT(a.appointment_id) AS Total_Citas, 
     COUNT(DISTINCT d.doctor_id) AS Total_Medicos, 
     ROUND(AVG(d.years_experience), 2) AS Promedio_Experiencia 
-FROM doctors AS d 
-JOIN appointments AS a 
+FROM hospital_md.doctors AS d 
+JOIN hospital_md.appointments AS a 
     ON d.doctor_id = a.doctor_id 
 GROUP BY d.specialization 
 ORDER BY Total_Citas DESC;
@@ -262,11 +274,12 @@ La consulta permitió comparar la frecuencia de los diferentes tipos de tratamie
 
 ```sql
 -- Frecuencia y costo promedio por tipo de tratamiento --
+
 SELECT 
     treatment_type, 
     COUNT(*) AS Total_Tratamientos, 
     ROUND(AVG(cost), 2) AS Costo_Promedio 
-FROM treatments 
+FROM hospital_md.treatments 
 GROUP BY treatment_type 
 ORDER BY Total_Tratamientos DESC;
 ```
@@ -284,11 +297,12 @@ La consulta puede resolverse con `AVG` para calcular el promedio general y una s
 
 ```sql
 -- Tratamientos con costo superior al promedio general --
+
 SELECT treatment_id,treatment_type, cost
-FROM treatments
+FROM hospital_md.treatments
 WHERE cost > (
     SELECT AVG(cost)
-    FROM treatments)
+    FROM hospital_md.treatments)
 ORDER BY cost DESC;
 ```
 
@@ -304,13 +318,14 @@ La consulta permitió identificar a los pacientes cuya facturación acumulada se
 
 ```sql
 -- Pacientes cuya facturación acumulada supera el promedio --
+
 SELECT
     p.patient_id,
     p.first_name,
     p.last_name,
     SUM(b.amount) AS Facturacion_Acumulada
-FROM patients AS p
-JOIN billing AS b
+FROM hospital_md.patients AS p
+JOIN hospital_md.billing AS b
     ON p.patient_id = b.patient_id
 GROUP BY
     p.patient_id,
@@ -322,7 +337,7 @@ HAVING SUM(b.amount) > (
         SELECT
             patient_id,
             SUM(amount) AS Facturacion_Paciente
-        FROM billing
+        FROM hospital_md.billing
         GROUP BY patient_id
     ) AS promedio_pacientes
 )
@@ -340,6 +355,7 @@ La consulta permitió identificar el tratamiento con mayor costo dentro de cada 
 
 ```SQL
 -- Tratamiento de mayor costo dentro de cada tipo --
+
 WITH Tratamientos_Rankeados AS (
     SELECT
         treatment_id,
@@ -349,9 +365,8 @@ WITH Tratamientos_Rankeados AS (
             PARTITION BY treatment_type
             ORDER BY cost DESC
         ) AS Posicion
-    FROM treatments
+    FROM hospital_md.treatments
 )
-
 SELECT
     treatment_id,
     treatment_type,
@@ -377,7 +392,7 @@ WITH Promedios AS (
     SELECT
         treatment_type,
         AVG(cost) AS Costo_Promedio
-    FROM treatments
+    FROM hospital_md.treatments
     GROUP BY treatment_type
 ),
 
@@ -390,7 +405,7 @@ Tratamientos_Rankeados AS (
             PARTITION BY treatment_type
             ORDER BY cost DESC
         ) AS Posicion
-    FROM treatments
+    FROM hospital_md.treatments
 )
 
 SELECT
@@ -424,8 +439,8 @@ SELECT
     SUM(CASE WHEN b.payment_status = 'Paid' THEN b.amount ELSE 0 END) AS Monto_Pagado,
     SUM(CASE WHEN b.payment_status = 'Pending' THEN b.amount ELSE 0 END) AS Monto_Pendiente,
     SUM(CASE WHEN b.payment_status = 'Cancelled' THEN b.amount ELSE 0 END) AS Monto_Cancelado
-FROM treatments AS t
-JOIN billing AS b
+FROM hospital_md.treatments AS t
+JOIN hospital_md.billing AS b
     ON t.treatment_id = b.treatment_id
 GROUP BY t.treatment_type
 ORDER BY Facturacion_Total DESC;
