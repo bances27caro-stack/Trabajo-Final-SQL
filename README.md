@@ -1,4 +1,4 @@
-<p align="center"><img src= img/portada.png width="100%" height="250"></p>
+<p align="center"><img src= img/portada.png width="100%" height="270"></p>
 
 # Proyecto SQL: Análisis de atenciones del Hospital Management Dataset
 
