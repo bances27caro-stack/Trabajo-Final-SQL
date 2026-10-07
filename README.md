@@ -187,7 +187,7 @@ GROUP BY status
 ORDER BY Total_Citas DESC;
 ```
 
-<p align="center"><img src= img/pregunta2.png>
+<p align="center"><img src= img/pregunta3.png>
 
 En total, se analizaron **200 citas**. Las citas no asistidas representan el **26%** del total, mientras que las citas programadas y canceladas representan cada una el **25,5%** y las citas completadas el **23%**.
 
